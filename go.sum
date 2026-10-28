@@ -139,8 +139,8 @@ github.com/hashicorp/go-multierror v1.1.1 h1:H5DkEtf6CXdFp0N0Em5UCwQpXMWke8IA0+l
 github.com/hashicorp/go-multierror v1.1.1/go.mod h1:iw975J/qwKPdAO1clOe2L8331t/9/fmwbPZ6JB6eMoM=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
-github.com/jkaninda/bkupkit v0.0.1 h1:ORVIllmGK4s1QzFaMv9502GxHUkIdOUPO0AkkyZJRIw=
-github.com/jkaninda/bkupkit v0.0.1/go.mod h1:TB2HVP8jRau/TdwfsO4QOgJY4Vi4h6HX+BlxJzXdcIg=
+github.com/jkaninda/bkupkit v0.0.2 h1:3a5J/8qwXX7TWYBwIX57OQvUQCqo3er/JZZwvgU8I1g=
+github.com/jkaninda/bkupkit v0.0.2/go.mod h1:TB2HVP8jRau/TdwfsO4QOgJY4Vi4h6HX+BlxJzXdcIg=
 github.com/jkaninda/encryptor v0.3.0 h1:m7r7ROyjXtVXpFTtdGAhHdcPLDD+6kb0eaTF9cY4KM4=
 github.com/jkaninda/encryptor v0.3.0/go.mod h1:ktF+sv4yLWa97xQt6Quhr1AWKwTnE7/HHEb6JJ3O7QU=
 github.com/jkaninda/go-storage v0.2.0 h1:EjhIcu+zFkqTqnCleJqyS2TJfIC8U+V+Imw/qN3OVJM=
