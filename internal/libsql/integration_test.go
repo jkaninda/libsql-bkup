@@ -51,9 +51,14 @@ func docker(t *testing.T, args ...string) string {
 	t.Helper()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
-	out, err := exec.CommandContext(ctx, "docker", args...).CombinedOutput()
+	cmd := exec.CommandContext(ctx, "docker", args...)
+	// Stdout only: "docker run" prints image pull progress on stderr, which would
+	// otherwise end up in the container id on a runner without the image.
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+	out, err := cmd.Output()
 	if err != nil {
-		t.Fatalf("docker %s: %v\n%s", strings.Join(args, " "), err, out)
+		t.Fatalf("docker %s: %v\n%s%s", strings.Join(args, " "), err, out, stderr.Bytes())
 	}
 	return strings.TrimSpace(string(out))
 }
