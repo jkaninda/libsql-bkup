@@ -45,7 +45,7 @@ func (e *Engine) Kind() string { return "libsql" }
 func (e *Engine) Settings(r *config.Registry) {
 	config.RegisterDatabase(r, "8080")
 	for _, k := range []string{
-		config.DBUsername, config.DBPassword, config.DBSSLMode, config.DBSSLCA, config.DBSSLCert, config.DBSSLKey,
+		config.DBUser, config.DBPassword, config.DBSSLMode, config.DBSSLCA, config.DBSSLCert, config.DBSSLKey,
 		config.AllDatabases, config.AllInOne, config.ExcludeDBs,
 		config.TargetDBURL, config.TargetDBHost, config.TargetDBPort, config.TargetDBName, config.TargetDBUser,
 		config.TargetDBPass, config.TargetDBSSL, config.TargetDBSSLCA,
