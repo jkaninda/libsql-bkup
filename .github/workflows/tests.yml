@@ -1,0 +1,58 @@
+name: Tests
+
+on:
+  push:
+    branches: [main, nightly, develop, v2]
+  pull_request:
+    branches: [main, dev]
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.26'
+      - name: Vet
+        run: |
+          go vet ./...
+          go vet -tags integration ./...
+      - name: Unit tests
+        run: go test -race ./...
+      - name: govulncheck
+        run: go run golang.org/x/vuln/cmd/govulncheck@latest ./...
+      - name: Fuzz the statement splitter against sqlite3_complete
+        run: go test ./internal/sqlscript -run '^$' -fuzz FuzzSplitMatchesSQLiteComplete -fuzztime 60s
+      - name: Env reference is generated
+        run: go run . config --env-docs > /dev/null
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.26'
+      - name: Integration tests (sqld, MinIO)
+        run: go test -tags integration -count=1 -timeout 20m -v ./...
+      - name: Build the image
+        run: docker build --build-arg appVersion=ci -t jkaninda/libsql-bkup:dev .
+      - name: Miabi relies on /bin/sh in the image
+        run: docker run --rm --entrypoint /bin/sh jkaninda/libsql-bkup:dev -c 'rm -f /backup/x'
+      - name: Image backup and restore against sqld
+        run: |
+          docker network create lbk
+          docker run -d --name sqld --network lbk ghcr.io/tursodatabase/libsql-server:latest
+          for i in $(seq 1 30); do docker run --rm --network lbk curlimages/curl -fsS http://sqld:8080/health && break; sleep 2; done
+          mkdir -p "$RUNNER_TEMP/backup"
+          printf 'CREATE TABLE items(id INTEGER PRIMARY KEY, name TEXT);\nINSERT INTO items VALUES (1,%s),(2,%s);\n' "'a'" "'b'" | gzip > "$RUNNER_TEMP/backup/seed.sql.gz"
+          docker run --rm --network lbk -v "$RUNNER_TEMP/backup:/backup" -e DB_URL=http://sqld:8080 jkaninda/libsql-bkup:dev restore -d testdb -f seed.sql.gz
+          docker run --rm --network lbk -v "$RUNNER_TEMP/backup:/backup" -e DB_HOST=sqld -e DB_PORT=8080 -e DB_NAME=testdb jkaninda/libsql-bkup:dev backup -d testdb
+          test "$(gunzip -c "$RUNNER_TEMP"/backup/testdb_*.sql.gz | grep -c 'INSERT INTO "items"')" -eq 2
+      - name: Clean up
+        if: always()
+        run: docker rm -f sqld || true

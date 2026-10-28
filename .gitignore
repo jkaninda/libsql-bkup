@@ -1,0 +1,7 @@
+/bin/
+/backup/
+/tmp/
+*.sql.gz
+*.sql
+.env
+.DS_Store
